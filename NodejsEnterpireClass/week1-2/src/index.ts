@@ -4,6 +4,7 @@
   const { IncomingMessage, ServerResponse } = require('http');
   const Post = require('./model/post');
   const handleError = require('./utils/error');
+  require('dotenv').config();
 
   interface Post {
     name: string;
@@ -11,7 +12,7 @@
   }
   
   mongoose
-    .connect('mongodb://localhost:27017/posts')
+    .connect(process.env.MONGODB_URL)
     .then(() => console.log('資料庫連接成功'));
 
   const requestListener = async (req: typeof IncomingMessage, res: typeof ServerResponse) => {
