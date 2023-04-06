@@ -1,6 +1,7 @@
 import express, { Request } from 'express';
 import { User } from '../../models';
 import { handleError, execStrategyActions } from '../../utils';
+import { getUsers, updateUser } from '../../controllers';
 
 interface Body {
   name: string;
@@ -17,21 +18,7 @@ interface UserRequest extends Request<Params> {
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
-  try {
-    const users = await User.find();
-    res.status(200).json({
-      status: 'success',
-      data: users
-    });
-  } catch (e) {
-    if (e instanceof Error) {
-      handleError(res, 500, e.message);
-    } else {
-      handleError(res, 500, 'Server Error');
-    }
-  }
-});
+router.get('/', getUsers);
 
 router.post('/', async (req: UserRequest, res) => {
   try {
@@ -76,37 +63,6 @@ router.post('/', async (req: UserRequest, res) => {
   }
 });
 
-router.patch('/:id', (req: UserRequest, res) => {
-  try {
-    const { id } = req.params;
-    const data = req.body;
-    const actions: Common.StrategyActions = [
-      [
-        id === ':id',
-        () => {
-          handleError(res, 400, 'id 不正確!');
-        }
-      ],
-      [
-        true,
-        async () => {
-          await User.findByIdAndUpdate(
-            { _id: id },
-            {
-              name: data.name,
-              email: data.email
-            }
-          );
-          res.status(200).json({
-            status: 'Success'
-          });
-        }
-      ]
-    ];
-    execStrategyActions(actions);
-  } catch (e) {
-    handleError(res, 500, 'Server Error');
-  }
-});
+router.patch('/:id', updateUser);
 
 export default router;
