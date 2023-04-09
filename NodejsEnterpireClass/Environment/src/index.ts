@@ -1,8 +1,5 @@
 import app from './app';
-import http from 'node:http';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import * as http from 'http';
 
 process.on('uncaughtException', (error) => {
   // 記錄錯誤下來，等到服務都處理完後，停掉該 process
