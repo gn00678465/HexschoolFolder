@@ -7,16 +7,29 @@ export function appError(statusCode: number, message: string) {
   return error;
 }
 
-type Callback = (req: Request, res: Response, next: NextFunction) => Promise<void>;
+type Callback<Req> = (
+  req: Req,
+  res: Response,
+  next: NextFunction
+) => Promise<void>;
 interface Options {
-  onError: (e: Service.AppError) => NextFunction
+  onError: (e: Service.AppError) => NextFunction;
 }
-export function handleErrorAsync(cb: Callback, opts?: Options): (req: Request, res: Response, next: NextFunction) => void
-export function handleErrorAsync(cb: Callback, opts?: Options) {
-  return function(req: Request, res: Response, next: NextFunction) {
-    const onError = opts?.onError || function(err) { return next(err); };
-    cb(req, res, next)
-      .catch(onError);
+export function handleErrorAsync<Req = Request>(
+  cb: Callback<Req>,
+  opts?: Options
+): (req: Request, res: Response, next: NextFunction) => void;
+export function handleErrorAsync<Req = Request>(
+  cb: Callback<Req>,
+  opts?: Options
+) {
+  return function (req: Req, res: Response, next: NextFunction) {
+    const onError =
+      opts?.onError ||
+      function (err) {
+        return next(err);
+      };
+    cb(req, res, next).catch(onError);
   };
 }
 
